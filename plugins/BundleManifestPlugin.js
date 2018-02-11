@@ -1,5 +1,4 @@
 const path = require('path');
-const hasha = require('hasha');
 const fs = require('fs');
 
 module.exports = function (bundler) {
@@ -20,37 +19,27 @@ module.exports = function (bundler) {
 
     try {
       return JSON.parse(fs.readFileSync(path, 'utf8'));
-    } catch(e) {
+    } catch (e) {
       logger.error('manifest file is invalid');
-      throw e; 
+      throw e;
     }
   };
 
-  /**
-   * Feed the manifest exploring childBundles recursively
-   * @param {Bundle} bundle 
-   * @param {Object} manifestValue 
-   * @param {string} publicURL 
-   */
-  const feedManifestValue = (bundle, manifestValue, publicURL) => {
-    let output = path.join(publicURL, path.basename(bundle.name));
-    let input = bundle.entryAsset ? bundle.entryAsset.basename : bundle.assets.values().next().value.basename;
-    manifestValue[input] = output;
-    logger.status('✓', `  bundle : ${input} => ${output}`);
-    bundle.childBundles.forEach(function (bundle) {
-      feedManifestValue(bundle, manifestValue, publicURL);
-    });
-  }
-
   bundler.on('bundled', (bundle) => {
+    const basename = bundle.entryAsset.generateBundleName();
+    const filepath = bundle.entryAsset.name;
+    const hash = bundle.entryAsset.hash;
+    const type = bundle.entryAsset.type;
+
     const dir = bundle.entryAsset.options.outDir;
-    const publicURL = bundle.entryAsset.options.publicURL;
 
     const manifestPath = path.resolve(dir, 'parcel-manifest.json');
     const manifestValue = readManifestJson(manifestPath);
 
+    manifestValue[basename] = hash + '.' + type;
+    fs.renameSync(path.join(dir, basename), path.join(dir, hash + '.' + type));
+
     logger.status('📦', 'PackageManifestPlugin');
-    feedManifestValue(bundle, manifestValue, publicURL);
     logger.status('📄', `manifest : ${manifestPath}`);
 
     fs.writeFileSync(manifestPath, JSON.stringify(manifestValue));
