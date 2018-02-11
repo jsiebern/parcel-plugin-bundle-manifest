@@ -37,7 +37,10 @@ module.exports = function (bundler) {
     const manifestValue = readManifestJson(manifestPath);
 
     manifestValue[basename] = hash + '.' + type;
-    fs.renameSync(path.join(dir, basename), path.join(dir, hash + '.' + type));
+    const origPath = path.join(dir, basename);
+    if (fs.existsSync(origPath)) {
+      fs.renameSync(origPath, path.join(dir, hash + '.' + type));
+    }
 
     logger.status('📦', 'PackageManifestPlugin');
     logger.status('📄', `manifest : ${manifestPath}`);
