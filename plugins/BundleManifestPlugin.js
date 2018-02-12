@@ -56,15 +56,19 @@ module.exports = function (bundler) {
   };
 
   const addToManifest = (bundle, manifest, rootName) => {
-    const basename = bundle.entryAsset.generateBundleName();
-    const filepath = bundle.entryAsset.name;
-    const type = bundle.entryAsset.type;
-    const dir = bundle.entryAsset.options.outDir;
+    const asset = bundle.entryAsset ? bundle.entryAsset : bundle.assets.values().next().value;
+    const type = asset.type;
+    const dir = asset.options.outDir;
+
+    let basename = asset.generateBundleName();
+    if (type === 'css') {
+      basename = `${rootName}.css`;
+    }
 
     const origPath = path.join(dir, basename);
-    const hash = hasha(bundle.entryAsset.hash + Array.from(bundle.assets).map(asset => asset.hash).join(''), { algorithm: 'md5' });
+    const hash = hasha(asset.hash + Array.from(bundle.assets).map(asset => asset.hash).join(''), { algorithm: 'md5' });
 
-    manifest[bundle.entryAsset.generateBundleName()] = `${rootName}.${hash}.${type}`;
+    manifest[basename] = `${rootName}.${hash}.${type}`;
 
     bundle.childBundles.forEach((bundle) => {
       addToManifest(bundle, manifest, rootName);
