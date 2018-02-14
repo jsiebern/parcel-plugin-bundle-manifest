@@ -1,6 +1,6 @@
 {
   "name": "parcel-plugin-bundle-manifest",
-  "version": "0.0.45",
+  "version": "0.0.46",
   "description": "Parcel plugin for generating an bundle manifest.",
   "main": "index.js",
   "keywords": [
@@ -11,7 +11,9 @@
   "author": "mugi-uno <mugi.uno@gmail.com>",
   "license": "MIT",
   "peerDependencies": {
-    "hasha": "^3.0.0",
     "parcel-bundler": "^1.1.0"
+  },
+  "dependencies": {
+    "hasha": "^3.0.0"
   }
 }
