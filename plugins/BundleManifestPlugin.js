@@ -8,7 +8,7 @@ module.exports = function (bundler) {
 
   /**
    * Read the paths already registered within the manifest.json
-   * @param {string} path 
+   * @param {string} path
    * @returns {Object}
    */
   const readManifestJson = (path) => {
@@ -25,10 +25,6 @@ module.exports = function (bundler) {
       logger.error('manifest file is invalid');
       throw e;
     }
-  };
-
-  const collectHashes = (bundle) => {
-    return Array.from(bundle.assets).map(asset => asset.hash).join('');
   };
 
   const addToManifest = (bundle, manifest, rootName) => {
